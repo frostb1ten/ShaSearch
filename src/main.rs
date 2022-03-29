@@ -1,15 +1,15 @@
 use walkdir::WalkDir;
 use std::env;
-use std::io::{self};
-use std::io::Write;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
+use std::io::{self, Write};
 use std::fs;
-use std::fs::File;
-use sha256::{digest, digest_bytes};
+use sha256::digest_bytes;
+use std::path::Path;
 
 
 fn main() {
+    if Path::new("./FileOut.txt").exists() {
+        fs::remove_file("./FileOut.txt");
+    }
     use std::time::Instant;
     let now = Instant::now();
     let args: Vec<String> = env::args().collect();
@@ -46,11 +46,11 @@ fn search(dir: String) {
 fn files(file: String) {
     let fileu8 = file.as_bytes();
     let hash = digest_bytes(&fileu8);
-    let mut files = OpenOptions::new()
+    let mut files = fs::OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open("FileOut.txt")
+        .open("./FileOut.txt")
         .unwrap();
     writeln!(files, "{}", hash);
     let args: Vec<String> = env::args().collect();
@@ -58,8 +58,4 @@ fn files(file: String) {
     if SHA == &hash {
         println!{"Hash found {} for file {}", hash, file};
     }
-}
-
-fn compare() {
-
 }
