@@ -1,9 +1,13 @@
+extern crate core;
+
 use walkdir::WalkDir;
 use std::env;
 use std::io::{self, Write};
 use std::fs;
 use sha256::digest_bytes;
 use std::path::Path;
+use sha2::{Sha256, Sha512, Digest};
+use sha256::digest_file;
 
 
 fn main() {
@@ -44,18 +48,18 @@ fn search(dir: String) {
 }
 
 fn files(file: String) {
-    let fileu8 = file.as_bytes();
-    let hash = digest_bytes(&fileu8);
+    for hash in sha256::digest_file(&file) {
     let mut files = fs::OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
         .open("./FileOut.txt")
         .unwrap();
-    writeln!(files, "{}", hash);
+    writeln!(files, "{} {}", file, hash);
     let args: Vec<String> = env::args().collect();
     let SHA = &args[2];
     if SHA == &hash {
         println!{"Hash found {} for file {}", hash, file};
+    }
     }
 }
